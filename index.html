@@ -153,12 +153,14 @@ async function doLogin(){const em=document.getElementById("email").value.trim(),
   document.getElementById("loginErr").textContent="";await afterLogin();}
 async function doRegister(){const em=document.getElementById("email").value.trim(),pw=document.getElementById("pw").value;
   document.getElementById("loginErr").textContent="...";document.getElementById("loginOk").textContent="";
-  const {error}=await SB.auth.signUp({email:em,password:pw});
+  const {data,error}=await SB.auth.signUp({email:em,password:pw});
   if(error){document.getElementById("loginErr").textContent="❌ "+error.message;return;}
+  try{if(data&&data.user){await SB.from("app_users").insert({auth_id:data.user.id,full_name:em,role:"viewer",status:"pending"});}}catch(e){}
+  await SB.auth.signOut();
   document.getElementById("loginErr").textContent="";document.getElementById("loginOk").textContent="✅ "+L("reg_ok");}
 async function afterLogin(){const {data:{user}}=await SB.auth.getUser();if(!user)return;USER=user.email;
   const {data:r}=await SB.rpc("my_role");ROLE=r||"viewer";
-  let status="approved";
+  let status=null;
   try{const {data:st}=await SB.rpc("my_status");if(st!==null&&st!==undefined)status=st;}catch(e){}
   if(status!=="approved"&&ROLE!=="admin"){document.getElementById("login").style.display="none";document.getElementById("pending").style.display="flex";return;}
   document.getElementById("userChip").textContent=USER+" ("+ROLE+")";
