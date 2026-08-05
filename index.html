@@ -117,7 +117,7 @@ const COMP=["Talabat","CAREEM","KEETA","Without Box","Delivero","NOON Food","Smi
 function canonCo(v){if(!v)return v;const k=String(v).trim().toLowerCase();const M={"talabat":"Talabat","careem":"CAREEM","keeta":"KEETA","deliveroo":"Delivero","delivero":"Delivero","noon food":"NOON Food","noon_food":"NOON Food","noonfood":"NOON Food","nsm":"NOON SUPER MALL","noon super mall":"NOON SUPER MALL","noon supermall":"NOON SUPER MALL","smiles":"Smiles","eco exp":"ECO","eco express":"ECO","eco":"ECO","dtc":"DTC","not yet deployed":"Not yet deployed","without box":"Without Box","white box":"White Box"};return M[k]||String(v).trim();}
 const CLR={"Working":"#d6f5df","New Rider":"#d7e8fb","Accident Injury":"#fce2cc","Annual Leave":"#fff6d5","Refused to Work":"#e2d9f3","Suspended":"#f2d4d4","إنهاء خدمة":"#e2e5e8","With Rider":"#d6f5df","Disposed 2026":"#eee"};
 const T={
- en:{login_sub:"Sign in to your account",email:"Email",password:"Password",login_btn:"Login",need_acct:"Need an account? Register",have_acct:"Have an account? Login",register_btn:"Register",reg_ok:"Registered! Wait for admin approval.",pending_msg:"Your account is awaiting admin approval.",refresh:"Refresh",logout:"Logout",imp_drv:"Import Drivers",imp_bk:"Import Bikes",backup:"Backup",imp_done:"imported / updated",imp_err:"Import error",
+ en:{login_sub:"Sign in to your account",email:"Email",password:"Password",login_btn:"Login",need_acct:"Need an account? Register",have_acct:"Have an account? Login",register_btn:"Register",reg_ok:"Registered! Wait for admin approval.",reg_dup:"This email is already registered — please Login.",reg_err:"Registration failed.",pending_msg:"Your account is awaiting admin approval.",refresh:"Refresh",logout:"Logout",imp_drv:"Import Drivers",imp_bk:"Import Bikes",backup:"Backup",imp_done:"imported / updated",imp_err:"Import error",
    t_dash:"Dashboard",t_drivers:"Drivers",t_bikes:"Bikes",t_audit:"Audit Log",t_users:"Users",
    active:"Total Drivers",working:"Working + New Rider",term:"Ended Service",bikesx:"Bikes (excl. Disposed)",wr:"With Rider",
    sync_drv:"Sync JDE",sync_confirm:"%n drivers are not in this file — mark them 'Ended Service'? (they stay in the system with their bike history)",sync_done:"marked Ended Service",
@@ -126,7 +126,7 @@ const T={
    c_id:"ID",c_name:"Name",c_company:"Company",c_bike:"Bike",c_cls:"Classification",c_jde:"JDE",c_plate:"Plate",c_driver:"Driver",c_motor:"Motor-ID",
    ndrv:"drivers",nbk:"bikes",when:"When",who:"User",what:"Action",tbl:"Table",fld:"Field",oldv:"Old",newv:"New",
    u_name:"Name / Email",u_role:"Role",u_status:"Status",u_action:"Action",approve:"Approve",pending:"Pending",approved:"Approved",audit_note:"Last 200 changes",details:"Details",hist_t:"Bike History",recv:"Received",lastup:"Last Updated",cur:"Current",bikeN:"Bike",assign_t:"Assign New Bike",assign_b:"Assign",nobike:"No bike",close:"Close",edit_hint2:"Change current bike status; away from With Rider releases it.",warn_a:"Bike %m is With Rider with:",confirm_a:"Reassign to this driver?"},
- ar:{login_sub:"سجّل دخولك للنظام",email:"الإيميل",password:"كلمة السر",login_btn:"دخول",need_acct:"ماعندكش حساب؟ سجّل",have_acct:"عندك حساب؟ ادخل",register_btn:"تسجيل",reg_ok:"تم التسجيل! استنى موافقة الأدمن.",pending_msg:"حسابك في انتظار موافقة الأدمن.",refresh:"تحديث",logout:"خروج",imp_drv:"استيراد سائقين",imp_bk:"استيراد دراجات",backup:"باك أب",imp_done:"اتضاف / اتحدّث",imp_err:"خطأ في الاستيراد",
+ ar:{login_sub:"سجّل دخولك للنظام",email:"الإيميل",password:"كلمة السر",login_btn:"دخول",need_acct:"ماعندكش حساب؟ سجّل",have_acct:"عندك حساب؟ ادخل",register_btn:"تسجيل",reg_ok:"تم التسجيل! استنى موافقة الأدمن.",reg_dup:"الإيميل ده مسجّل قبل كده — سجّل دخول.",reg_err:"فشل التسجيل.",pending_msg:"حسابك في انتظار موافقة الأدمن.",refresh:"تحديث",logout:"خروج",imp_drv:"استيراد سائقين",imp_bk:"استيراد دراجات",backup:"باك أب",imp_done:"اتضاف / اتحدّث",imp_err:"خطأ في الاستيراد",
    t_dash:"الداش بورد",t_drivers:"السائقين",t_bikes:"الدراجات",t_audit:"سجل التتبّع",t_users:"المستخدمين",
    active:"إجمالي السائقين",working:"شغّالين + جدد",term:"إنهاء خدمة",bikesx:"الدراجات (بدون المتكهّنة)",wr:"شغّالة",
    sync_drv:"مزامنة JDE",sync_confirm:"فيه %n سائق مش في الملف ده — نعلّمهم \"إنهاء خدمة\"؟ (هيفضلوا في النظام بسجل دراجاتهم)",sync_done:"اتعلّموا إنهاء خدمة",
@@ -154,8 +154,9 @@ async function doLogin(){const em=document.getElementById("email").value.trim(),
 async function doRegister(){const em=document.getElementById("email").value.trim(),pw=document.getElementById("pw").value;
   document.getElementById("loginErr").textContent="...";document.getElementById("loginOk").textContent="";
   const {data,error}=await SB.auth.signUp({email:em,password:pw});
-  if(error){document.getElementById("loginErr").textContent="❌ "+error.message;return;}
-  try{if(data&&data.user){await SB.from("app_users").insert({auth_id:data.user.id,full_name:em,role:"viewer",status:"pending"});}}catch(e){}
+  if(error){document.getElementById("loginErr").textContent="❌ "+(error.message||L("reg_err"));return;}
+  if(data&&data.user&&data.user.identities&&data.user.identities.length===0){document.getElementById("loginErr").textContent="❌ "+L("reg_dup");return;}
+  if(data&&data.user){const {error:ie}=await SB.from("app_users").insert({auth_id:data.user.id,full_name:em,role:"viewer",status:"pending"});if(ie&&ie.code!=="23505"){document.getElementById("loginErr").textContent="❌ "+ie.message;return;}}
   await SB.auth.signOut();
   document.getElementById("loginErr").textContent="";document.getElementById("loginOk").textContent="✅ "+L("reg_ok");}
 async function afterLogin(){const {data:{user}}=await SB.auth.getUser();if(!user)return;USER=user.email;
@@ -223,15 +224,17 @@ function renderBikes(){document.getElementById("bikes").innerHTML=`<div class="t
 function fB(){const f=bF.trim().toLowerCase();return DB.bikes.filter(b=>(!f||String(b.motor_id).toLowerCase().includes(f)||String(b.plate||"").toLowerCase().includes(f))&&(!bStat||b.status===bStat)&&(!bComp||b.company===bComp));}
 function drawB(){const rows=fB(),per=50,pg=Math.ceil(rows.length/per)||1;if(bP>=pg)bP=0;const sl=rows.slice(bP*per,bP*per+per);
   document.getElementById("bc").textContent=rows.length+" "+L("nbk");
-  let h=`<table><tr><th>${L("c_motor")}</th><th>${L("c_plate")}</th><th>${L("sts")}</th><th>${L("c_company")}</th><th>${L("c_driver")}</th></tr>`;
+  let h=`<table><tr><th>${L("c_motor")}</th><th>${L("c_plate")}</th><th>${L("sts")}</th><th>${L("c_company")}</th><th>${L("c_driver")}</th><th>${L("lastup")}</th></tr>`;
   sl.forEach(b=>{h+=`<tr><td>${b.motor_id}</td><td>${b.plate||"—"}</td>
     <td><select onchange="upB('${b.motor_id}','status',this.value)">${BST.map(s=>`<option ${b.status===s?"selected":""}>${s}</option>`).join("")}<option ${!BST.includes(b.status)?"selected":""}>${b.status||""}</option></select></td>
     <td><select onchange="upB('${b.motor_id}','company',this.value)">${COMP.map(c=>`<option ${b.company===c?"selected":""}>${c}</option>`).join("")}<option ${!COMP.includes(b.company)?"selected":""}>${b.company||""}</option></select></td>
-    <td>${b.driver_id||"—"}</td></tr>`;});
+    <td>${b.driver_id||"—"}</td><td style="font-weight:600;color:#0b8043">${b.updated_at?new Date(b.updated_at).toLocaleDateString("en-GB"):"—"}</td></tr>`;});
   h+=`</table>`;document.getElementById("bt").innerHTML=h;
   document.getElementById("bpg").innerHTML=pg>1?`<button onclick="bP--;drawB()" ${bP===0?"disabled":""}>◄</button><span>${bP+1}/${pg}</span><button onclick="bP++;drawB()" ${bP>=pg-1?"disabled":""}>►</button>`:"";}
-async function upB(id,field,val){const b=DB.bikes.find(x=>x.motor_id===id);if(b)b[field]=val;
-  const {error}=await SB.from("bikes").update({[field]:val,updated_by:USER,updated_at:new Date().toISOString()}).eq("motor_id",id);if(error)alert("❌ "+error.message);}
+async function upB(id,field,val){const b=DB.bikes.find(x=>x.motor_id===id);const now=new Date().toISOString();if(b){b[field]=val;b.updated_at=now;}
+  const {error}=await SB.from("bikes").update({[field]:val,updated_by:USER,updated_at:now}).eq("motor_id",id);if(error){alert("❌ "+error.message);return;}
+  if(field==="status"&&b&&b.driver_id){await SB.from("bike_history").update({status:val,last_updated:new Date().toLocaleDateString("en-GB")}).eq("motor_id",id).eq("driver_id",b.driver_id);}
+  drawB();}
 
 async function renderAudit(){document.getElementById("audit").innerHTML='<div class="loading">...</div>';
   const {data}=await SB.from("audit_log").select("*").order("ts",{ascending:false}).limit(200);
@@ -324,7 +327,7 @@ async function editCurStatus(id,motor,val){const d=DB.drivers.find(x=>x.driver_i
 async function assignBike(id){const d=DB.drivers.find(x=>x.driver_id===id);const m=document.getElementById("am").value.trim().toUpperCase();const p=document.getElementById("ap").value.trim();
   if(!m){alert(L("c_motor")+"?");return;}const today=new Date().toLocaleDateString("en-GB");
   const tbk=DB.bikes.find(b=>b.motor_id===m);
-  if(tbk&&tbk.status==="With Rider"&&tbk.driver_id&&String(tbk.driver_id)!==String(id)){
+  if(tbk&&tbk.driver_id&&String(tbk.driver_id)!==String(id)){
     const cur=DB.drivers.find(x=>String(x.driver_id)===String(tbk.driver_id));const NL=String.fromCharCode(10);
     const info=cur?(tbk.driver_id+" — "+(cur.name||"")):("ID "+tbk.driver_id);
     if(!confirm(L("warn_a").replace("%m",m)+NL+info+NL+NL+L("confirm_a")))return;
