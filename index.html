@@ -111,11 +111,11 @@ body.isadmin .tabs .admin-only{display:inline-block!important;}
 
 <script>
 const SB=supabase.createClient("https://vtyggxdpigvpablvsnpj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0eWdneGRwaWd2cGFibHZzbnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4MjM2MzUsImV4cCI6MjEwMTM5OTYzNX0.gHWYfe6nBX23lVPTLLtIuz00VCw2oBp6chtfi2m0pdc");
-const CLS=["Working","New Rider","Accident Injury","Annual Leave","Refused to Work","Refused Bike","Suspended","إنهاء خدمة"];
+const CLS=["Working","New Rider","Accident Injury","Annual Leave","Refused to Work","Refused Bike","Suspended","Ended Service"];
 const BST=["With Rider","Parked at DTC - Usable","Parked at DTC - Non-usable","With Maintenance section","With Accident section","Disposed 2026","Impound/loss with police"];
 const COMP=["Talabat","CAREEM","KEETA","Without Box","Delivero","NOON Food","Smiles","NOON SUPER MALL","Talabat AUH","KEETA AUH","Talabat Alain","CAREEM AUH","ECO","White Box","Not yet deployed","DTC"];
 function canonCo(v){if(!v)return v;const k=String(v).trim().toLowerCase();const M={"talabat":"Talabat","careem":"CAREEM","keeta":"KEETA","deliveroo":"Delivero","delivero":"Delivero","noon food":"NOON Food","noon_food":"NOON Food","noonfood":"NOON Food","nsm":"NOON SUPER MALL","noon super mall":"NOON SUPER MALL","noon supermall":"NOON SUPER MALL","smiles":"Smiles","eco exp":"ECO","eco express":"ECO","eco":"ECO","dtc":"DTC","not yet deployed":"Not yet deployed","without box":"Without Box","white box":"White Box"};return M[k]||String(v).trim();}
-const CLR={"Working":"#d6f5df","New Rider":"#d7e8fb","Accident Injury":"#fce2cc","Annual Leave":"#fff6d5","Refused to Work":"#e2d9f3","Refused Bike":"#fde0d0","Suspended":"#f2d4d4","إنهاء خدمة":"#e2e5e8","With Rider":"#d6f5df","Disposed 2026":"#eee"};
+const CLR={"Working":"#d6f5df","New Rider":"#d7e8fb","Accident Injury":"#fce2cc","Annual Leave":"#fff6d5","Refused to Work":"#e2d9f3","Refused Bike":"#fde0d0","Suspended":"#f2d4d4","Ended Service":"#e2e5e8","With Rider":"#d6f5df","Disposed 2026":"#eee"};
 const T={
  en:{login_sub:"Sign in to your account",email:"Email",password:"Password",login_btn:"Login",need_acct:"Need an account? Register",have_acct:"Have an account? Login",register_btn:"Register",reg_ok:"Registered! Wait for admin approval.",reg_dup:"This email is already registered — please Login.",reg_err:"Registration failed.",pending_msg:"Your account is awaiting admin approval.",refresh:"Refresh",logout:"Logout",imp_drv:"Import Drivers",imp_bk:"Import Bikes",backup:"Backup",imp_done:"imported / updated",imp_err:"Import error",
    t_dash:"Dashboard",t_drivers:"Drivers",t_bikes:"Bikes",t_audit:"Audit Log",t_users:"Users",
@@ -125,7 +125,7 @@ const T={
    search:"Search...",allc:"All companies",allcls:"All classifications",allst:"All statuses",
    c_id:"ID",c_name:"Name",c_company:"Company",c_bike:"Bike",c_cls:"Classification",c_jde:"JDE",c_plate:"Plate",c_driver:"Driver",c_motor:"Motor-ID",
    ndrv:"drivers",nbk:"bikes",when:"When",who:"User",what:"Action",tbl:"Table",fld:"Field",oldv:"Old",newv:"New",
-   u_name:"Name / Email",u_role:"Role",u_status:"Status",u_action:"Action",approve:"Approve",pending:"Pending",approved:"Approved",audit_note:"Last 200 changes",revert:"Undo",revert_c:"Undo this change? %f goes back to: %v",revert_done:"Change reverted.",revert_no:"This entry can't be undone.",details:"Details",hist_t:"Bike History",recv:"Received",lastup:"Last Updated",cur:"Current",bikeN:"Bike",assign_t:"Assign New Bike",assign_b:"Assign",nobike:"No bike",close:"Close",edit_hint2:"Change current bike status; away from With Rider releases it.",warn_a:"Bike %m is With Rider with:",confirm_a:"Reassign to this driver?"},
+   u_name:"Name / Email",u_role:"Role",u_status:"Status",u_action:"Action",approve:"Approve",pending:"Pending",approved:"Approved",audit_note:"Last 200 changes",revert:"Undo",revert_c:"Undo this change? %f goes back to: %v",revert_done:"Change reverted.",revert_no:"This entry can't be undone.",all_users:"All users",today:"Today",clear:"Clear",export:"Export",changes:"changes",details:"Details",hist_t:"Bike History",recv:"Received",lastup:"Last Updated",cur:"Current",bikeN:"Bike",assign_t:"Assign New Bike",assign_b:"Assign",nobike:"No bike",close:"Close",edit_hint2:"Change current bike status; away from With Rider releases it.",warn_a:"Bike %m is With Rider with:",confirm_a:"Reassign to this driver?"},
  ar:{login_sub:"سجّل دخولك للنظام",email:"الإيميل",password:"كلمة السر",login_btn:"دخول",need_acct:"ماعندكش حساب؟ سجّل",have_acct:"عندك حساب؟ ادخل",register_btn:"تسجيل",reg_ok:"تم التسجيل! استنى موافقة الأدمن.",reg_dup:"الإيميل ده مسجّل قبل كده — سجّل دخول.",reg_err:"فشل التسجيل.",pending_msg:"حسابك في انتظار موافقة الأدمن.",refresh:"تحديث",logout:"خروج",imp_drv:"استيراد سائقين",imp_bk:"استيراد دراجات",backup:"باك أب",imp_done:"اتضاف / اتحدّث",imp_err:"خطأ في الاستيراد",
    t_dash:"الداش بورد",t_drivers:"السائقين",t_bikes:"الدراجات",t_audit:"سجل التتبّع",t_users:"المستخدمين",
    active:"إجمالي السائقين",working:"شغّالين + جدد",term:"إنهاء خدمة",bikesx:"الدراجات (بدون المتكهّنة)",wr:"شغّالة",
@@ -134,7 +134,7 @@ const T={
    search:"بحث...",allc:"كل الشركات",allcls:"كل التصنيفات",allst:"كل الحالات",
    c_id:"الرقم",c_name:"الاسم",c_company:"الشركة",c_bike:"الدراجة",c_cls:"التصنيف",c_jde:"JDE",c_plate:"اللوحة",c_driver:"السائق",c_motor:"رقم الدراجة",
    ndrv:"سائق",nbk:"دراجة",when:"إمتى",who:"مين",what:"التعديل",tbl:"الجدول",fld:"الحقل",oldv:"قبل",newv:"بعد",
-   u_name:"الاسم / الإيميل",u_role:"الصلاحية",u_status:"الحالة",u_action:"إجراء",approve:"موافقة",pending:"معلّق",approved:"مفعّل",audit_note:"آخر 200 تعديل",revert:"تراجع",revert_c:"ترجّع التعديل ده؟ %f هيرجع لـ: %v",revert_done:"التعديل اترجّع.",revert_no:"التعديل ده ماينفعش يترجع.",details:"تفاصيل",hist_t:"تاريخ الدراجات",recv:"تاريخ الاستلام",lastup:"آخر تحديث",cur:"◀ الحالية",bikeN:"دراجة",assign_t:"تخصيص دراجة جديدة",assign_b:"تخصيص",nobike:"مفيش دراجة",close:"إغلاق",edit_hint2:"غيّر حالة الدراجة الحالية؛ لو غير With Rider تترجّع من السائق.",warn_a:"الدراجة %m شغّالة مع:",confirm_a:"تنقلها للسائق ده؟"}};
+   u_name:"الاسم / الإيميل",u_role:"الصلاحية",u_status:"الحالة",u_action:"إجراء",approve:"موافقة",pending:"معلّق",approved:"مفعّل",audit_note:"آخر 200 تعديل",revert:"تراجع",revert_c:"ترجّع التعديل ده؟ %f هيرجع لـ: %v",revert_done:"التعديل اترجّع.",revert_no:"التعديل ده ماينفعش يترجع.",all_users:"كل المستخدمين",today:"النهاردة",clear:"مسح",export:"تصدير",changes:"تعديل",details:"تفاصيل",hist_t:"تاريخ الدراجات",recv:"تاريخ الاستلام",lastup:"آخر تحديث",cur:"◀ الحالية",bikeN:"دراجة",assign_t:"تخصيص دراجة جديدة",assign_b:"تخصيص",nobike:"مفيش دراجة",close:"إغلاق",edit_hint2:"غيّر حالة الدراجة الحالية؛ لو غير With Rider تترجّع من السائق.",warn_a:"الدراجة %m شغّالة مع:",confirm_a:"تنقلها للسائق ده؟"}};
 let LANG="en",ROLE="viewer",USER="",REG=false,DB={drivers:[],bikes:[]};
 function L(k){return (T[LANG]&&T[LANG][k])||k;}
 function applyLang(){document.documentElement.dir=(LANG==="ar")?"rtl":"ltr";document.documentElement.lang=LANG;
@@ -182,7 +182,7 @@ function refreshView(){const a=document.querySelector(".tabs button.active");if(
   if(id==="drivers")renderDrivers();else if(id==="bikes")renderBikes();else if(id==="audit")renderAudit();else if(id==="users")renderUsers();}
 
 function renderDash(){const D=DB.drivers,B=DB.bikes;if(!D.length&&!B.length)return;
-  const ended=D.filter(d=>d.classification==="إنهاء خدمة").length,total=D.length-ended,working=D.filter(d=>d.classification==="Working"||d.classification==="New Rider").length;
+  const ended=D.filter(d=>d.classification==="Ended Service").length,total=D.length-ended,working=D.filter(d=>d.classification==="Working"||d.classification==="New Rider").length;
   const cc={};D.forEach(d=>cc[d.classification]=(cc[d.classification]||0)+1);const bc={};B.forEach(b=>bc[b.status]=(bc[b.status]||0)+1);
   const disp=B.filter(b=>String(b.status).includes("Disposed")).length;
   let h=`<div class="cards">
@@ -236,14 +236,26 @@ async function upB(id,field,val){const b=DB.bikes.find(x=>x.motor_id===id);const
   if(field==="status"&&b&&b.driver_id){await SB.from("bike_history").update({status:val,last_updated:new Date().toLocaleDateString("en-GB")}).eq("motor_id",id).eq("driver_id",b.driver_id);}
   drawB();}
 
-let AUD=[];
+let AUD=[],AUDUSERS=[],audUser="",audDate="";
 async function renderAudit(){document.getElementById("audit").innerHTML='<div class="loading">...</div>';
-  const {data}=await SB.from("audit_log").select("*").order("ts",{ascending:false}).limit(200);AUD=data||[];
+  if(!AUDUSERS.length){const u=await SB.from("audit_log").select("user_name").limit(3000);AUDUSERS=[...new Set((u.data||[]).map(x=>x.user_name).filter(Boolean))].sort();}
+  let q=SB.from("audit_log").select("*").order("ts",{ascending:false});
+  if(audUser)q=q.eq("user_name",audUser);
+  if(audDate){q=q.gte("ts",audDate+"T00:00:00").lte("ts",audDate+"T23:59:59.999").limit(5000);}else{q=q.limit(200);}
+  const {data}=await q;AUD=data||[];
   const adm=document.body.classList.contains("isadmin");const PKM={drivers:"driver_id",bikes:"motor_id",bike_history:"id",app_users:"id"};
-  let h=`<table><tr><th>${L("when")}</th><th>${L("who")}</th><th>${L("what")}</th><th>${L("tbl")}</th><th>${L("c_id")}</th><th>${L("fld")}</th><th>${L("oldv")}</th><th>${L("newv")}</th>${adm?`<th>${L("revert")}</th>`:""}</tr>`;
+  let h=`<div class="toolbar"><select onchange="audUser=this.value;renderAudit()"><option value="">${L("all_users")}</option>${AUDUSERS.map(u=>`<option ${audUser===u?"selected":""}>${u}</option>`).join("")}</select>`+
+    `<input type="date" value="${audDate}" onchange="audDate=this.value;renderAudit()">`+
+    `<button class="btn" onclick="audDate='${new Date().toISOString().slice(0,10)}';renderAudit()">${L("today")}</button>`+
+    `<button class="btn" onclick="audDate='';audUser='';renderAudit()">${L("clear")}</button>`+
+    `<button class="btn" style="background:#0b8043" onclick="exportAudit()">⬇ ${L("export")}</button>`+
+    `<span class="count">${AUD.length} ${L("changes")}</span></div>`;
+  h+=`<table><tr><th>${L("when")}</th><th>${L("who")}</th><th>${L("what")}</th><th>${L("tbl")}</th><th>${L("c_id")}</th><th>${L("fld")}</th><th>${L("oldv")}</th><th>${L("newv")}</th>${adm?`<th>${L("revert")}</th>`:""}</tr>`;
   AUD.forEach((r,i)=>{const rv=adm&&r.action==="UPDATE"&&r.field_changed&&PKM[r.table_name];
     h+=`<tr><td>${new Date(r.ts).toLocaleString("en-GB")}</td><td>${r.user_name||"—"}</td><td>${r.action}</td><td>${r.table_name}</td><td>${r.record_id||"—"}</td><td>${r.field_changed||"—"}</td><td>${r.old_value||"—"}</td><td style="font-weight:600;color:#0b8043">${r.new_value||"—"}</td>${adm?`<td>${rv?`<button class="dbtn" onclick="revertAudit(${i})">↩ ${L("revert")}</button>`:"—"}</td>`:""}</tr>`;});
   h+=`</table>`;document.getElementById("audit").innerHTML=h;}
+function exportAudit(){const rows=AUD.map(r=>({When:new Date(r.ts).toLocaleString("en-GB"),User:r.user_name||"",Action:r.action,Table:r.table_name,ID:r.record_id||"",Field:r.field_changed||"",Old:r.old_value||"",New:r.new_value||""}));
+  const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Audit");XLSX.writeFile(wb,"DTC_Audit_"+(audDate||"all")+(audUser?"_"+audUser.split("@")[0]:"")+".xlsx");}
 async function revertAudit(i){const r=AUD[i];if(!r)return;const PK={drivers:"driver_id",bikes:"motor_id",bike_history:"id",app_users:"id"}[r.table_name];
   if(!PK||r.action!=="UPDATE"||!r.field_changed){alert(L("revert_no"));return;}
   if(!confirm(L("revert_c").replace("%f",r.field_changed).replace("%v",r.old_value==null?"—":r.old_value)))return;
@@ -288,9 +300,9 @@ async function importList(input,kind,sync){const file=input.files[0];if(!file){r
     if(!recs.length){alert(L("imp_err"));return;}
     let ok=0;for(let i=0;i<recs.length;i+=500){const {error}=await SB.from(kind).upsert(recs.slice(i,i+500),{onConflict:kind==="drivers"?"driver_id":"motor_id"});if(error){alert("❌ "+error.message);return;}ok+=recs.slice(i,i+500).length;}
     alert("✅ "+ok+" "+L("imp_done"));
-    if(sync&&kind==="drivers"){const others=DB.drivers.filter(d=>!fileIds.has(d.driver_id)&&d.classification!=="إنهاء خدمة").map(d=>d.driver_id);
+    if(sync&&kind==="drivers"){const others=DB.drivers.filter(d=>!fileIds.has(d.driver_id)&&d.classification!=="Ended Service").map(d=>d.driver_id);
       if(others.length&&confirm(L("sync_confirm").replace("%n",others.length))){let e2=0;
-        for(let i=0;i<others.length;i+=400){const {error}=await SB.from("drivers").update({classification:"إنهاء خدمة",updated_by:USER,updated_at:new Date().toISOString()}).in("driver_id",others.slice(i,i+400));if(error){e2++;}}
+        for(let i=0;i<others.length;i+=400){const {error}=await SB.from("drivers").update({classification:"Ended Service",updated_by:USER,updated_at:new Date().toISOString()}).in("driver_id",others.slice(i,i+400));if(error){e2++;}}
         alert(e2?("⚠️ "+e2+" batch error"):("✅ "+others.length+" "+L("sync_done")));}}
     await loadAll();
   }catch(err){alert("❌ "+err.message);}};
