@@ -114,11 +114,11 @@ body.isadmin .tabs .admin-only{display:inline-block!important;}
 
 <script>
 const SB=supabase.createClient("https://vtyggxdpigvpablvsnpj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0eWdneGRwaWd2cGFibHZzbnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4MjM2MzUsImV4cCI6MjEwMTM5OTYzNX0.gHWYfe6nBX23lVPTLLtIuz00VCw2oBp6chtfi2m0pdc");
-const CLS=["Working","New Rider","Accident Injury","Annual Leave","Refused to Work","Refused Bike","Suspended","Ended Service"];
+const CLS=["Working","New Rider","Accident Injury","Annual Leave","Refused to Work","Refused Bike","Suspended","Ended Service","Resigned"];
 const BST=["With Rider","Parked at DTC - Usable","Parked at DTC - Non-usable","With Maintenance section","With Accident section","Disposed 2026","Impound/loss with police"];
 const COMP=["Talabat","CAREEM","KEETA","Without Box","Delivero","NOON Food","Smiles","NOON SUPER MALL","Talabat AUH","KEETA AUH","Talabat Alain","CAREEM AUH","ECO","White Box","Not yet deployed","DTC"];
 function canonCo(v){if(!v)return v;const k=String(v).trim().toLowerCase();const M={"talabat":"Talabat","careem":"CAREEM","keeta":"KEETA","deliveroo":"Delivero","delivero":"Delivero","noon food":"NOON Food","noon_food":"NOON Food","noonfood":"NOON Food","nsm":"NOON SUPER MALL","noon super mall":"NOON SUPER MALL","noon supermall":"NOON SUPER MALL","smiles":"Smiles","eco exp":"ECO","eco express":"ECO","eco":"ECO","dtc":"DTC","not yet deployed":"Not yet deployed","without box":"Without Box","white box":"White Box"};return M[k]||String(v).trim();}
-const CLR={"Working":"#d6f5df","New Rider":"#d7e8fb","Accident Injury":"#fce2cc","Annual Leave":"#fff6d5","Refused to Work":"#e2d9f3","Refused Bike":"#fde0d0","Suspended":"#f2d4d4","Ended Service":"#e2e5e8","With Rider":"#d6f5df","Disposed 2026":"#eee"};
+const CLR={"Working":"#d6f5df","New Rider":"#d7e8fb","Accident Injury":"#fce2cc","Annual Leave":"#fff6d5","Refused to Work":"#e2d9f3","Refused Bike":"#fde0d0","Suspended":"#f2d4d4","Ended Service":"#e2e5e8","Resigned":"#d9dee3","With Rider":"#d6f5df","Disposed 2026":"#eee"};
 const T={
  en:{login_sub:"Sign in to your account",email:"Email",password:"Password",login_btn:"Login",need_acct:"Need an account? Register",have_acct:"Have an account? Login",register_btn:"Register",reg_ok:"Registered! Wait for admin approval.",reg_dup:"This email is already registered — please Login.",reg_err:"Registration failed.",pending_msg:"Your account is awaiting admin approval.",refresh:"Refresh",logout:"Logout",imp_drv:"Import Drivers",imp_bk:"Import Bikes",backup:"Backup",imp_done:"imported / updated",imp_err:"Import error",
    t_dash:"Dashboard",t_drivers:"Drivers",t_bikes:"Bikes",t_audit:"Audit Log",t_users:"Users",
@@ -185,7 +185,7 @@ function refreshView(){const a=document.querySelector(".tabs button.active");if(
   if(id==="drivers")renderDrivers();else if(id==="bikes")renderBikes();else if(id==="audit")renderAudit();else if(id==="users")renderUsers();}
 
 function renderDash(){const D=DB.drivers,B=DB.bikes;if(!D.length&&!B.length)return;
-  const ended=D.filter(d=>d.classification==="Ended Service").length,total=D.length-ended,working=D.filter(d=>d.classification==="Working"||d.classification==="New Rider").length;
+  const ended=D.filter(d=>d.classification==="Ended Service"||d.classification==="Resigned").length,total=D.length-ended,working=D.filter(d=>d.classification==="Working"||d.classification==="New Rider").length;
   const cc={};D.forEach(d=>cc[d.classification]=(cc[d.classification]||0)+1);const bc={};B.forEach(b=>bc[b.status]=(bc[b.status]||0)+1);
   const disp=B.filter(b=>String(b.status).includes("Disposed")).length;
   let h=`<div class="cards">
@@ -303,7 +303,7 @@ async function importList(input,kind,sync){const file=input.files[0];if(!file){r
     if(!recs.length){alert(L("imp_err"));return;}
     let ok=0;for(let i=0;i<recs.length;i+=500){const {error}=await SB.from(kind).upsert(recs.slice(i,i+500),{onConflict:kind==="drivers"?"driver_id":"motor_id"});if(error){alert("❌ "+error.message);return;}ok+=recs.slice(i,i+500).length;}
     alert("✅ "+ok+" "+L("imp_done"));
-    if(sync&&kind==="drivers"){const others=DB.drivers.filter(d=>!fileIds.has(d.driver_id)&&d.classification!=="Ended Service").map(d=>d.driver_id);
+    if(sync&&kind==="drivers"){const others=DB.drivers.filter(d=>!fileIds.has(d.driver_id)&&d.classification!=="Ended Service"&&d.classification!=="Resigned").map(d=>d.driver_id);
       if(others.length&&confirm(L("sync_confirm").replace("%n",others.length))){let e2=0;
         for(let i=0;i<others.length;i+=400){const {error}=await SB.from("drivers").update({classification:"Ended Service",updated_by:USER,updated_at:new Date().toISOString()}).in("driver_id",others.slice(i,i+400));if(error){e2++;}}
         alert(e2?("⚠️ "+e2+" batch error"):("✅ "+others.length+" "+L("sync_done")));}}
