@@ -27,6 +27,9 @@ html[dir=rtl] th,html[dir=rtl] td{text-align:right;} html[dir=ltr] th,html[dir=l
 tr:hover td{background:#f7fbf8;}
 td select{width:100%;border:1px solid transparent;background:transparent;padding:5px;border-radius:5px;font-size:13px;cursor:pointer;}
 td select:hover{border-color:var(--line);background:#fff;}
+.hinp{width:104px;border:1px solid transparent;border-radius:5px;padding:4px 6px;font-size:13px;background:transparent;font-family:inherit;color:inherit;}
+.hinp:hover,.hinp:focus{border-color:var(--line);background:#fff;outline:none;}
+body.viewonly .hinp{pointer-events:none;border-color:transparent;background:transparent;}
 body.viewonly td select{pointer-events:none;-webkit-appearance:none;appearance:none;border:none;background:transparent;font-weight:600;}
 body.viewonly .edit-only{display:none!important;}
 .admin-only{display:none!important;}
@@ -328,13 +331,14 @@ async function openDetail(id){const d=DB.drivers.find(x=>x.driver_id===id);if(!d
   if(hist&&hist.length){h+=`<table><tr><th>#</th><th>${L("c_motor")}</th><th>${L("c_plate")}</th><th>${L("recv")}</th><th>${L("sts")}</th><th>${L("lastup")}</th></tr>`;
     hist.forEach((b,n)=>{const cur=b.motor_id===d.cur_motor;
       const stc=cur?`<select class="edit-only" onchange="editCurStatus(${id},'${b.motor_id}',this.value)">${BST.map(s=>`<option ${curSt===s?"selected":""}>${s}</option>`).join("")}</select>`:(b.status||"—");
-      h+=`<tr ${cur?'class="curbadge"':''}><td>${cur?L("cur"):L("bikeN")+" "+(n+1)}</td><td><b>${b.motor_id}</b></td><td>${b.plate||"—"}</td><td>${b.received_date||"—"}</td><td>${cur?stc:(b.status||"—")}</td><td style="font-weight:600;color:#0b8043">${b.last_updated||"—"}</td></tr>`;});
+      h+=`<tr ${cur?'class="curbadge"':''}><td>${cur?L("cur"):L("bikeN")+" "+(n+1)}</td><td><b>${b.motor_id}</b></td><td>${b.plate||"—"}</td><td><input class="hinp" value="${b.received_date||''}" placeholder="DD/MM/YYYY" onchange="upHist(${b.id},'received_date',this.value)"></td><td>${cur?stc:(b.status||"—")}</td><td><input class="hinp" style="font-weight:600;color:#0b8043" value="${b.last_updated||''}" placeholder="DD/MM/YYYY" onchange="upHist(${b.id},'last_updated',this.value)"></td></tr>`;});
     h+=`</table><p style="font-size:12px;color:#778;margin-top:8px" class="edit-only">💡 ${L("edit_hint2")}</p>`;}else{h+=`<p style="color:#889">—</p>`;}
   h+=`<div class="assignbox edit-only"><h4 style="color:var(--c);margin-bottom:10px">➕ ${L("assign_t")}</h4><div class="row">
     <input type="text" id="am" placeholder="${L("c_motor")} (DLB123)"><input type="text" id="ap" placeholder="${L("c_plate")}">
     <button class="btn" onclick="assignBike(${id})">${L("assign_b")}</button></div></div></div>`;
   document.getElementById("modal").innerHTML=h;}
 function closeModal(){document.getElementById("overlay").style.display="none";}
+async function upHist(hid,field,val){const {error}=await SB.from("bike_history").update({[field]:val.trim()}).eq("id",hid);if(error)alert("❌ "+error.message);}
 
 async function editCurStatus(id,motor,val){const d=DB.drivers.find(x=>x.driver_id===id);const today=new Date().toLocaleDateString("en-GB");
   await SB.from("bikes").update({status:val,updated_by:USER,updated_at:new Date().toISOString()}).eq("motor_id",motor);
