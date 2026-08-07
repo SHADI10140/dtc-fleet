@@ -241,7 +241,7 @@ async function upB(id,field,val){const b=DB.bikes.find(x=>x.motor_id===id);const
 
 let AUD=[],AUDUSERS=[],audUser="",audDate="";
 async function renderAudit(){document.getElementById("audit").innerHTML='<div class="loading">...</div>';
-  if(!AUDUSERS.length){const u=await SB.from("audit_log").select("user_name").limit(3000);AUDUSERS=[...new Set((u.data||[]).map(x=>x.user_name).filter(Boolean))].sort();}
+  if(!AUDUSERS.length){const u=await SB.from("app_users").select("full_name");AUDUSERS=[...new Set([...(u.data||[]).map(x=>x.full_name).filter(Boolean),"النظام"])].sort();}
   let q=SB.from("audit_log").select("*").order("ts",{ascending:false});
   if(audUser)q=q.eq("user_name",audUser);
   if(audDate){q=q.gte("ts",audDate+"T00:00:00").lte("ts",audDate+"T23:59:59.999").limit(5000);}else{q=q.limit(200);}
