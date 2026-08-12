@@ -204,7 +204,11 @@ let dP=0,dF="",dCls="",dComp="";
 function renderDrivers(){document.getElementById("drivers").innerHTML=`<div class="toolbar"><input type="text" placeholder="${L("search")}" value="${dF}" oninput="dF=this.value;dP=0;drawD()">
   <select onchange="dComp=this.value;dP=0;drawD()"><option value="">${L("allc")}</option>${COMP.map(c=>`<option ${dComp===c?"selected":""}>${c}</option>`).join("")}</select>
   <select onchange="dCls=this.value;dP=0;drawD()"><option value="">${L("allcls")}</option>${CLS.map(c=>`<option ${dCls===c?"selected":""}>${c}</option>`).join("")}</select>
-  <span class="count" id="dc"></span></div><div id="dt"></div><div class="pager" id="dpg"></div>`;drawD();}
+  <button class="btn" style="background:#0b8043" onclick="exportDrivers()">⬇ ${L("export")}</button><span class="count" id="dc"></span></div><div id="dt"></div><div class="pager" id="dpg"></div>`;drawD();}
+async function exportDrivers(){const list=fD();const ids=[...new Set(list.map(d=>d.driver_id))];const recMap={};
+  for(let k=0;k<ids.length;k+=300){const {data}=await SB.from("bike_history").select("driver_id,motor_id,received_date").in("driver_id",ids.slice(k,k+300));(data||[]).forEach(h=>{recMap[h.driver_id+"|"+h.motor_id]=h.received_date;});}
+  const rows=list.map(d=>({"DTC ID":d.driver_id,Name:d.name||"",Company:canonCo(d.company)||"",Bike:d.cur_motor||"",Plate:d.cur_plate||"",Classification:d.classification||"","Bike Received":(d.cur_motor?recMap[d.driver_id+"|"+d.cur_motor]:"")||""}));
+  const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Drivers");XLSX.writeFile(wb,"DTC_Drivers"+(dComp?"_"+dComp:"")+(dCls?"_"+dCls.replace(/[^\w]/g,""):"")+".xlsx");}
 function fD(){const f=dF.trim().toLowerCase();return DB.drivers.filter(d=>(!f||String(d.driver_id).includes(f)||(d.name||"").toLowerCase().includes(f))&&(!dCls||d.classification===dCls)&&(!dComp||canonCo(d.company)===dComp));}
 function drawD(){const rows=fD(),per=50,pg=Math.ceil(rows.length/per)||1;if(dP>=pg)dP=0;const sl=rows.slice(dP*per,dP*per+per);
   document.getElementById("dc").textContent=rows.length+" "+L("ndrv");
