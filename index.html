@@ -395,4 +395,7 @@ async function assignBike(id){const d=DB.drivers.find(x=>x.driver_id===id);const
   openDetail(id);drawD();alert("✅ "+m);}
 
 (async()=>{const {data:{session}}=await SB.auth.getSession();if(session)await afterLogin();applyLang();})();
+const APP_VER="v20260807-1";
+function checkVer(){fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/APP_VER="([^"]+)"/);if(m&&m[1]!==APP_VER){const a=document.activeElement;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;location.reload();}}).catch(()=>{});}
+setInterval(checkVer,60000);
 </script></body></html>
