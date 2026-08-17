@@ -207,7 +207,7 @@ function renderDrivers(){document.getElementById("drivers").innerHTML=`<div clas
   <select onchange="dCls=this.value;dP=0;drawD()"><option value="">${L("allcls")}</option>${CLS.map(c=>`<option ${dCls===c?"selected":""}>${c}</option>`).join("")}</select>
   <label style="font-size:12px;color:#556">${L("recv_from")} <input type="date" value="${dRecvFrom}" onchange="dRecvFrom=this.value" style="padding:7px;border:1px solid var(--line);border-radius:6px"></label>
   <label style="font-size:12px;color:#556">${L("recv_to")} <input type="date" value="${dRecvTo}" onchange="dRecvTo=this.value" style="padding:7px;border:1px solid var(--line);border-radius:6px"></label>
-  <button class="btn" style="background:#0b8043" onclick="exportDrivers()">⬇ ${L("export")}</button><span class="count" id="dc"></span></div><div id="dt"></div><div class="pager" id="dpg"></div>`;drawD();}
+  <button class="btn admin-only" style="background:#0b8043" onclick="exportDrivers()">⬇ ${L("export")}</button><span class="count" id="dc"></span></div><div id="dt"></div><div class="pager" id="dpg"></div>`;drawD();}
 async function exportDrivers(){const list=fD();const ids=[...new Set(list.map(d=>d.driver_id))];const recMap={};
   for(let k=0;k<ids.length;k+=300){const {data}=await SB.from("bike_history").select("driver_id,motor_id,received_date").in("driver_id",ids.slice(k,k+300));(data||[]).forEach(h=>{recMap[h.driver_id+"|"+h.motor_id]=h.received_date;});}
   const fromD=dRecvFrom?new Date(dRecvFrom):null,toD=dRecvTo?new Date(dRecvTo+"T23:59:59"):null;
