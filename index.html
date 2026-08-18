@@ -216,7 +216,7 @@ async function exportDrivers(){const list=fD();const ids=[...new Set(list.map(d=
     .map(x=>({"DTC ID":x.d.driver_id,Name:x.d.name||"",Company:canonCo(x.d.company)||"",Bike:x.d.cur_motor||"",Plate:x.d.cur_plate||"",Classification:x.d.classification||"","Bike Received":x.rv,Phone:x.d.phone||""}));
   if(!rows.length){alert(L("no_rows"));return;}
   const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Drivers");XLSX.writeFile(wb,"DTC_Drivers"+(dComp?"_"+dComp:"")+(dCls?"_"+dCls.replace(/[^\w]/g,""):"")+".xlsx");}
-function fD(){const f=dF.trim().toLowerCase();return DB.drivers.filter(d=>(!f||String(d.driver_id).includes(f)||(d.name||"").toLowerCase().includes(f))&&(!dCls||d.classification===dCls)&&(!dComp||canonCo(d.company)===dComp));}
+function fD(){const f=dF.trim().toLowerCase();return DB.drivers.filter(d=>(!f||String(d.driver_id).includes(f)||(d.name||"").toLowerCase().includes(f)||(d.phone||"").toLowerCase().includes(f))&&(!dCls||d.classification===dCls)&&(!dComp||canonCo(d.company)===dComp));}
 function drawD(){const rows=fD(),per=50,pg=Math.ceil(rows.length/per)||1;if(dP>=pg)dP=0;const sl=rows.slice(dP*per,dP*per+per);
   document.getElementById("dc").textContent=rows.length+" "+L("ndrv");
   let h=`<table><tr><th>${L("c_id")}</th><th>${L("c_name")}</th><th>${L("c_company")}</th><th>${L("c_bike")}</th><th>${L("c_cls")}</th><th>${L("c_phone")}</th><th></th></tr>`;
@@ -397,7 +397,7 @@ async function assignBike(id){const d=DB.drivers.find(x=>x.driver_id===id);const
   openDetail(id);drawD();alert("✅ "+m);}
 
 (async()=>{const {data:{session}}=await SB.auth.getSession();if(session)await afterLogin();applyLang();})();
-const APP_VER="v20260807-2";
+const APP_VER="v20260807-3";
 function checkVer(){fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/APP_VER="([^"]+)"/);if(m&&m[1]!==APP_VER){const a=document.activeElement;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;location.reload();}}).catch(()=>{});}
 setInterval(checkVer,60000);
 </script></body></html>
