@@ -251,18 +251,19 @@ async function upB(id,field,val){const b=DB.bikes.find(x=>x.motor_id===id);const
   if(field==="status"&&b&&b.driver_id){await SB.from("bike_history").update({status:val,last_updated:new Date().toLocaleDateString("en-GB")}).eq("motor_id",id).eq("driver_id",b.driver_id);}
   drawB();}
 
-let AUD=[],AUDUSERS=[],audUser="",audDate="";
+let AUD=[],AUDUSERS=[],audUser="",audFrom="",audTo="";
 async function renderAudit(){document.getElementById("audit").innerHTML='<div class="loading">...</div>';
   if(!AUDUSERS.length){const u=await SB.from("app_users").select("full_name");AUDUSERS=[...new Set([...(u.data||[]).map(x=>x.full_name).filter(Boolean),"النظام"])].sort();}
   let q=SB.from("audit_log").select("*").order("ts",{ascending:false});
   if(audUser)q=q.eq("user_name",audUser);
-  if(audDate){q=q.gte("ts",audDate+"T00:00:00").lte("ts",audDate+"T23:59:59.999").limit(5000);}else{q=q.limit(200);}
+  if(audFrom||audTo){if(audFrom)q=q.gte("ts",audFrom+"T00:00:00");if(audTo)q=q.lte("ts",audTo+"T23:59:59.999");q=q.limit(5000);}else{q=q.limit(200);}
   const {data}=await q;AUD=data||[];
   const adm=document.body.classList.contains("isadmin");const PKM={drivers:"driver_id",bikes:"motor_id",bike_history:"id",app_users:"id"};
   let h=`<div class="toolbar"><select onchange="audUser=this.value;renderAudit()"><option value="">${L("all_users")}</option>${AUDUSERS.map(u=>`<option ${audUser===u?"selected":""}>${u}</option>`).join("")}</select>`+
-    `<input type="date" value="${audDate}" onchange="audDate=this.value;renderAudit()">`+
-    `<button class="btn" onclick="audDate='${new Date().toISOString().slice(0,10)}';renderAudit()">${L("today")}</button>`+
-    `<button class="btn" onclick="audDate='';audUser='';renderAudit()">${L("clear")}</button>`+
+    `<label style="font-size:12px;color:#556">${L("recv_from")} <input type="date" value="${audFrom}" onchange="audFrom=this.value;renderAudit()" style="padding:7px;border:1px solid var(--line);border-radius:6px"></label>`+
+    `<label style="font-size:12px;color:#556">${L("recv_to")} <input type="date" value="${audTo}" onchange="audTo=this.value;renderAudit()" style="padding:7px;border:1px solid var(--line);border-radius:6px"></label>`+
+    `<button class="btn" onclick="audFrom=audTo=new Date().toISOString().slice(0,10);renderAudit()">${L("today")}</button>`+
+    `<button class="btn" onclick="audFrom='';audTo='';audUser='';renderAudit()">${L("clear")}</button>`+
     `<button class="btn" style="background:#0b8043" onclick="exportAudit()">⬇ ${L("export")}</button>`+
     (adm?`<button class="btn" style="background:#c0392b" onclick="revertSelected()">↩ ${L("revert_sel")}</button>`:"")+
     `<span class="count">${AUD.length} ${L("changes")}</span></div>`;
@@ -271,7 +272,7 @@ async function renderAudit(){document.getElementById("audit").innerHTML='<div cl
     h+=`<tr>${adm?`<td>${rv?`<input type="checkbox" class="audck" data-i="${i}">`:""}</td>`:""}<td>${new Date(r.ts).toLocaleString("en-GB")}</td><td>${r.user_name||"—"}</td><td>${r.action}</td><td>${r.table_name}</td><td>${r.record_id||"—"}</td><td>${r.field_changed||"—"}</td><td>${r.old_value||"—"}</td><td style="font-weight:600;color:#0b8043">${r.new_value||"—"}</td>${adm?`<td>${rv?`<button class="dbtn" onclick="revertAudit(${i})">↩ ${L("revert")}</button>`:"—"}</td>`:""}</tr>`;});
   h+=`</table>`;document.getElementById("audit").innerHTML=h;}
 function exportAudit(){const rows=AUD.map(r=>({When:new Date(r.ts).toLocaleString("en-GB"),User:r.user_name||"",Action:r.action,Table:r.table_name,ID:r.record_id||"",Field:r.field_changed||"",Old:r.old_value||"",New:r.new_value||""}));
-  const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Audit");XLSX.writeFile(wb,"DTC_Audit_"+(audDate||"all")+(audUser?"_"+audUser.split("@")[0]:"")+".xlsx");}
+  const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Audit");XLSX.writeFile(wb,"DTC_Audit_"+(audFrom||audTo?(audFrom||"start")+"_"+(audTo||"end"):"all")+(audUser?"_"+audUser.split("@")[0]:"")+".xlsx");}
 function audToggleAll(ch){document.querySelectorAll(".audck").forEach(c=>c.checked=ch);}
 async function doRevert(r){const PK={drivers:"driver_id",bikes:"motor_id",bike_history:"id",app_users:"id"}[r.table_name];
   if(!PK||r.action!=="UPDATE"||!r.field_changed)return false;
@@ -417,7 +418,7 @@ async function assignBike(id){const d=DB.drivers.find(x=>x.driver_id===id);const
   openDetail(id);drawD();alert("✅ "+m);}
 
 (async()=>{const {data:{session}}=await SB.auth.getSession();if(session)await afterLogin();applyLang();})();
-const APP_VER="v20260807-6";
+const APP_VER="v20260807-7";
 function checkVer(){fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/APP_VER="([^"]+)"/);if(m&&m[1]!==APP_VER){const a=document.activeElement;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;location.reload();}}).catch(()=>{});}
 setInterval(checkVer,60000);
 </script></body></html>
