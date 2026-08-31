@@ -91,6 +91,7 @@ body.isadmin .tabs .admin-only{display:inline-block!important;}
     <button class="btn admin-only" onclick="document.getElementById('syncDrv').click()" style="background:#0a3d5c"><span data-i18n="sync_drv">Sync JDE</span></button>
     <button class="btn admin-only" onclick="document.getElementById('impBk').click()"><span data-i18n="imp_bk">Import Bikes</span></button>
     <button class="btn admin-only" onclick="backup()" style="background:#0a3d5c"><span data-i18n="backup">Backup</span></button>
+    <button class="btn admin-only" onclick="refreshAll()" style="background:#7a5c00"><span data-i18n="refresh_all">Refresh All</span></button>
     <button class="btn" onclick="loadAll()"><span data-i18n="refresh">Refresh</span></button>
     <input type="file" id="impDrv" accept=".xlsx,.xls,.csv" style="display:none" onchange="importList(this,'drivers')">
     <input type="file" id="syncDrv" accept=".xlsx,.xls,.csv" style="display:none" onchange="importList(this,'drivers',true)">
@@ -120,7 +121,7 @@ const COMP=["Talabat","CAREEM","KEETA","Without Box","Delivero","NOON Food","Smi
 function canonCo(v){if(!v)return v;const k=String(v).trim().toLowerCase();const M={"talabat":"Talabat","careem":"CAREEM","keeta":"KEETA","deliveroo":"Delivero","delivero":"Delivero","noon food":"NOON Food","noon_food":"NOON Food","noonfood":"NOON Food","nsm":"NOON SUPER MALL","noon super mall":"NOON SUPER MALL","noon supermall":"NOON SUPER MALL","smiles":"Smiles","eco exp":"ECO","eco express":"ECO","eco":"ECO","dtc":"DTC","not yet deployed":"Not yet deployed","without box":"Without Box","white box":"White Box"};return M[k]||String(v).trim();}
 const CLR={"Working":"#d6f5df","New Rider":"#d7e8fb","Accident Injury":"#fce2cc","Annual Leave":"#fff6d5","Refused to Work":"#e2d9f3","Refused Bike":"#fde0d0","Suspended":"#f2d4d4","Ended Service":"#e2e5e8","Resigned":"#d9dee3","With Rider":"#d6f5df","Disposed 2026":"#eee"};
 const T={
- en:{login_sub:"Sign in to your account",email:"Email",password:"Password",login_btn:"Login",need_acct:"Need an account? Register",have_acct:"Have an account? Login",register_btn:"Register",reg_ok:"Registered! Wait for admin approval.",reg_dup:"This email is already registered — please Login.",reg_err:"Registration failed.",pending_msg:"Your account is awaiting admin approval.",refresh:"Refresh",logout:"Logout",imp_drv:"Import Drivers",imp_bk:"Import Bikes",backup:"Backup",imp_done:"imported / updated",imp_err:"Import error",
+ en:{login_sub:"Sign in to your account",email:"Email",password:"Password",login_btn:"Login",need_acct:"Need an account? Register",have_acct:"Have an account? Login",register_btn:"Register",reg_ok:"Registered! Wait for admin approval.",reg_dup:"This email is already registered — please Login.",reg_err:"Registration failed.",pending_msg:"Your account is awaiting admin approval.",refresh:"Refresh",logout:"Logout",imp_drv:"Import Drivers",imp_bk:"Import Bikes",backup:"Backup",imp_done:"imported / updated",imp_err:"Import error",refresh_all:"Refresh All",refresh_all_c:"Force a data refresh for ALL users now?",refresh_all_ok:"All users will refresh within a minute",
    t_dash:"Dashboard",t_drivers:"Drivers",t_bikes:"Bikes",t_audit:"Audit Log",t_users:"Users",
    active:"Total Drivers",working:"Working + New Rider",term:"Ended Service",bikesx:"Bikes (excl. Disposed)",wr:"With Rider",
    sync_drv:"Sync JDE",sync_confirm:"%n drivers are not in this file — mark them 'Ended Service'? (they stay in the system with their bike history)",sync_done:"marked Ended Service",
@@ -129,7 +130,7 @@ const T={
    c_id:"ID",c_name:"Name",c_company:"Company",c_bike:"Bike",c_cls:"Classification",c_jde:"JDE",c_plate:"Plate",c_driver:"Driver",c_motor:"Motor-ID",
    ndrv:"drivers",nbk:"bikes",when:"When",who:"User",what:"Action",tbl:"Table",fld:"Field",oldv:"Old",newv:"New",
    u_name:"Name / Email",u_role:"Role",u_status:"Status",u_action:"Action",approve:"Approve",pending:"Pending",approved:"Approved",audit_note:"Last 200 changes",revert:"Undo",revert_c:"Undo this change? %f goes back to: %v",revert_done:"Change reverted.",revert_no:"This entry can't be undone.",all_users:"All users",today:"Today",clear:"Clear",export:"Export",changes:"changes",recv_from:"Received from",recv_to:"to",no_rows:"No matching drivers",c_phone:"Phone",bad_date:"Date must be DD/MM/YYYY (e.g. 25/07/2026)",revert_sel:"Revert selected",revert_selc:"Revert %n selected changes?",revert_none:"Select changes first",details:"Details",hist_t:"Bike History",recv:"Received",lastup:"Last Updated",cur:"Current",bikeN:"Bike",assign_t:"Assign New Bike",assign_b:"Assign",nobike:"No bike",close:"Close",edit_hint2:"Change current bike status; away from With Rider releases it.",warn_a:"Bike %m is With Rider with:",confirm_a:"Reassign to this driver?"},
- ar:{login_sub:"سجّل دخولك للنظام",email:"الإيميل",password:"كلمة السر",login_btn:"دخول",need_acct:"ماعندكش حساب؟ سجّل",have_acct:"عندك حساب؟ ادخل",register_btn:"تسجيل",reg_ok:"تم التسجيل! استنى موافقة الأدمن.",reg_dup:"الإيميل ده مسجّل قبل كده — سجّل دخول.",reg_err:"فشل التسجيل.",pending_msg:"حسابك في انتظار موافقة الأدمن.",refresh:"تحديث",logout:"خروج",imp_drv:"استيراد سائقين",imp_bk:"استيراد دراجات",backup:"باك أب",imp_done:"اتضاف / اتحدّث",imp_err:"خطأ في الاستيراد",
+ ar:{login_sub:"سجّل دخولك للنظام",email:"الإيميل",password:"كلمة السر",login_btn:"دخول",need_acct:"ماعندكش حساب؟ سجّل",have_acct:"عندك حساب؟ ادخل",register_btn:"تسجيل",reg_ok:"تم التسجيل! استنى موافقة الأدمن.",reg_dup:"الإيميل ده مسجّل قبل كده — سجّل دخول.",reg_err:"فشل التسجيل.",pending_msg:"حسابك في انتظار موافقة الأدمن.",refresh:"تحديث",logout:"خروج",imp_drv:"استيراد سائقين",imp_bk:"استيراد دراجات",backup:"باك أب",imp_done:"اتضاف / اتحدّث",imp_err:"خطأ في الاستيراد",refresh_all:"تحديث للكل",refresh_all_c:"تجبر كل المستخدمين يعملوا تحديث للبيانات دلوقتي؟",refresh_all_ok:"كل المستخدمين هيتحدّثوا خلال دقيقة",
    t_dash:"الداش بورد",t_drivers:"السائقين",t_bikes:"الدراجات",t_audit:"سجل التتبّع",t_users:"المستخدمين",
    active:"إجمالي السائقين",working:"شغّالين + جدد",term:"إنهاء خدمة",bikesx:"الدراجات (بدون المتكهّنة)",wr:"شغّالة",
    sync_drv:"مزامنة JDE",sync_confirm:"فيه %n سائق مش في الملف ده — نعلّمهم \"إنهاء خدمة\"؟ (هيفضلوا في النظام بسجل دراجاتهم)",sync_done:"اتعلّموا إنهاء خدمة",
@@ -418,7 +419,11 @@ async function assignBike(id){const d=DB.drivers.find(x=>x.driver_id===id);const
   openDetail(id);drawD();alert("✅ "+m);}
 
 (async()=>{const {data:{session}}=await SB.auth.getSession();if(session)await afterLogin();applyLang();})();
-const APP_VER="v20260807-7";
+const APP_VER="v20260807-8";
 function checkVer(){fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/APP_VER="([^"]+)"/);if(m&&m[1]!==APP_VER){const a=document.activeElement;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;location.reload();}}).catch(()=>{});}
 setInterval(checkVer,60000);
+let SIG=null;
+async function refreshAll(){if(!confirm(L("refresh_all_c")))return;const {error}=await SB.from("app_signal").update({refresh_at:new Date().toISOString()}).eq("id",1);if(error){alert("❌ "+error.message);return;}alert("✅ "+L("refresh_all_ok"));}
+async function checkSig(){try{const {data}=await SB.from("app_signal").select("refresh_at").eq("id",1).single();if(!data)return;if(SIG===null){SIG=data.refresh_at;return;}if(data.refresh_at!==SIG){const a=document.activeElement;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;SIG=data.refresh_at;location.reload();}}catch(e){}}
+setInterval(checkSig,60000);checkSig();
 </script></body></html>
