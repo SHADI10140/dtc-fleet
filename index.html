@@ -339,13 +339,27 @@ async function importList(input,kind,sync){const file=input.files[0];if(!file){r
   }catch(err){alert("❌ "+err.message);}};
   rd.readAsArrayBuffer(file);input.value="";}
 
-function backup(){const wb=XLSX.utils.book_new();
+async function backup(){const wb=XLSX.utils.book_new();
   const dh=[["Driver ID","Name","Company","Plate","Motor","Classification","JDE"]];
   DB.drivers.forEach(d=>dh.push([d.driver_id,d.name,d.company,d.cur_plate,d.cur_motor,d.classification,d.jde_status]));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(dh),"Drivers");
   const bh=[["Motor-ID","Plate","Status","Company","Driver"]];
   DB.bikes.forEach(b=>bh.push([b.motor_id,b.plate,b.status,b.company,b.driver_id]));
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(bh),"Bikes");
+  // Bike Usage history: each driver who held a bike, received/returned dates + days used
+  let hist=[],from=0;while(true){const {data}=await SB.from("bike_history").select("*").order("motor_id",{ascending:true}).range(from,from+999);if(!data||!data.length)break;hist=hist.concat(data);if(data.length<1000)break;from+=1000;}
+  const nm={};DB.drivers.forEach(d=>nm[d.driver_id]=d.name);const cur={};DB.bikes.forEach(b=>cur[b.motor_id]=b.driver_id);
+  const fmt=d=>{const z=n=>(""+n).padStart(2,"0");return z(d.getDate())+"/"+z(d.getMonth()+1)+"/"+d.getFullYear();};
+  const today=new Date(),tstr=fmt(today),g={};hist.forEach(h=>{(g[h.motor_id]=g[h.motor_id]||[]).push(h);});
+  const uh=[["Motor-ID","Plate","Driver ID","Driver Name","Received","Returned","Days Used","Still With Rider","Status"]];
+  Object.keys(g).sort().forEach(m=>{const arr=g[m].slice().sort((a,b)=>(pdmy(a.received_date)||0)-(pdmy(b.received_date)||0));
+    arr.forEach((h,i)=>{const start=pdmy(h.received_date);let end,estr,still="";
+      if(i<arr.length-1){end=pdmy(arr[i+1].received_date);estr=end?fmt(end):"";}
+      else if(cur[m]===h.driver_id){end=today;estr=tstr;still="Yes";}
+      else{end=pdmy(h.last_updated);estr=end?fmt(end):"";}
+      const days=(start&&end)?Math.max(0,Math.round((end-start)/86400000)):"";
+      uh.push([m,h.plate||"",h.driver_id,nm[h.driver_id]||"",h.received_date||"",estr,days,still,h.status||""]);});});
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(uh),"Bike Usage");
   XLSX.writeFile(wb,"DTC_Fleet_Backup_"+new Date().toISOString().slice(0,10)+".xlsx");}
 
 async function openDetail(id){const d=DB.drivers.find(x=>x.driver_id===id);if(!d)return;
@@ -397,7 +411,7 @@ async function assignBike(id){const d=DB.drivers.find(x=>x.driver_id===id);const
   openDetail(id);drawD();alert("✅ "+m);}
 
 (async()=>{const {data:{session}}=await SB.auth.getSession();if(session)await afterLogin();applyLang();})();
-const APP_VER="v20260807-3";
+const APP_VER="v20260807-4";
 function checkVer(){fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/APP_VER="([^"]+)"/);if(m&&m[1]!==APP_VER){const a=document.activeElement;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;location.reload();}}).catch(()=>{});}
 setInterval(checkVer,60000);
 </script></body></html>
