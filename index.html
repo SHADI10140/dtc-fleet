@@ -418,8 +418,9 @@ async function assignBike(id){const d=DB.drivers.find(x=>x.driver_id===id);const
   d.cur_motor=m;d.cur_plate=p;d.classification="Working";const bk=DB.bikes.find(b=>b.motor_id===m);if(bk){bk.driver_id=id;bk.status="With Rider";}
   openDetail(id);drawD();alert("✅ "+m);}
 
+SB.auth.onAuthStateChange(async(ev)=>{if(ev==="PASSWORD_RECOVERY"){let np=prompt(L("new_pw_prompt"));if(!np)return;if(np.length<6){alert(L("pw_short"));return;}const {error}=await SB.auth.updateUser({password:np});if(error){alert("❌ "+error.message);return;}alert("✅ "+L("pw_done"));location.href=location.pathname;}});
 (async()=>{const {data:{session}}=await SB.auth.getSession();if(session)await afterLogin();applyLang();})();
-const APP_VER="v20260807-10";
+const APP_VER="v20260807-11";
 function checkVer(){fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/APP_VER="([^"]+)"/);if(m&&m[1]!==APP_VER){const a=document.activeElement;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;location.reload();}}).catch(()=>{});}
 setInterval(checkVer,60000);
 let SIG=null;
