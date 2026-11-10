@@ -103,12 +103,14 @@ body.isadmin .tabs .admin-only{display:inline-block!important;}
   <button class="active" onclick="tab('dash',this)" data-i18n="t_dash">Dashboard</button>
   <button onclick="tab('drivers',this)" data-i18n="t_drivers">Drivers</button>
   <button onclick="tab('bikes',this)" data-i18n="t_bikes">Bikes</button>
+  <button onclick="tab('bike2',this)" data-i18n="t_bike2">Regular Bike</button>
   <button class="admin-only" onclick="tab('audit',this)" data-i18n="t_audit">Audit Log</button>
   <button onclick="tab('users',this)" id="usersTab" data-i18n="t_users" style="display:none">Users</button>
 </div>
 <div class="wrap">
   <div id="dash"><div class="loading">...</div></div>
   <div id="drivers" style="display:none"></div><div id="bikes" style="display:none"></div>
+  <div id="bike2" style="display:none"><div class="tabs" id="b2subs" style="margin-bottom:12px"><button class="active" onclick="b2sub('d',this)" data-i18n="t_drivers">Drivers</button><button onclick="b2sub('b',this)" data-i18n="t_bikes">Bikes</button></div><div id="b2dwrap"><div id="b2d"></div></div><div id="b2bwrap" style="display:none"><div id="b2b"></div></div></div>
   <div id="audit" style="display:none"></div><div id="users" style="display:none"></div>
 </div>
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal"></div></div>
@@ -122,7 +124,7 @@ function canonCo(v){if(!v)return v;const k=String(v).trim().toLowerCase();const 
 const CLR={"Working":"#d6f5df","New Rider":"#d7e8fb","Accident Injury":"#fce2cc","Annual Leave":"#fff6d5","Refused to Work":"#e2d9f3","Refused Bike":"#fde0d0","Suspended":"#f2d4d4","Ended Service":"#e2e5e8","Resigned":"#d9dee3","With Rider":"#d6f5df","Disposed 2026":"#eee"};
 const T={
  en:{login_sub:"Sign in to your account",email:"Email",password:"Password",login_btn:"Login",need_acct:"Need an account? Register",have_acct:"Have an account? Login",register_btn:"Register",reg_ok:"Registered! Wait for admin approval.",new_pw_prompt:"Enter a new password (min 6 characters):",pw_short:"Password must be at least 6 characters",pw_done:"Password changed. Please log in with the new password.",link_expired:"The link may be expired or already used. Request a new one and open it immediately.",reg_dup:"This email is already registered — please Login.",reg_err:"Registration failed.",pending_msg:"Your account is awaiting admin approval.",refresh:"Refresh",logout:"Logout",imp_drv:"Import Drivers",imp_bk:"Import Bikes",backup:"Backup",imp_done:"imported / updated",imp_err:"Import error",refresh_all:"Refresh All",refresh_all_c:"Force a data refresh for ALL users now?",refresh_all_ok:"All users will refresh within a minute",
-   t_dash:"Dashboard",t_drivers:"Drivers",t_bikes:"Bikes",t_audit:"Audit Log",t_users:"Users",
+   t_dash:"Dashboard",t_drivers:"Drivers",t_bikes:"Bikes",t_bike2:"Regular Bike",t_audit:"Audit Log",t_users:"Users",
    active:"Total Drivers",working:"Working + New Rider",term:"Ended Service",bikesx:"Bikes (excl. Disposed)",wr:"With Rider",
    sync_drv:"Sync JDE",sync_confirm:"%n drivers are not in this file — mark them 'Ended Service'? (they stay in the system with their bike history)",sync_done:"marked Ended Service",
    cls_t:"Drivers — Classification",bst_t:"Bikes — Status",clsh:"Classification",cnt:"Count",sts:"Status",
@@ -131,7 +133,7 @@ const T={
    ndrv:"drivers",nbk:"bikes",when:"When",who:"User",what:"Action",tbl:"Table",fld:"Field",oldv:"Old",newv:"New",
    u_name:"Name / Email",u_role:"Role",u_status:"Status",u_action:"Action",approve:"Approve",pending:"Pending",approved:"Approved",audit_note:"Last 200 changes",revert:"Undo",revert_c:"Undo this change? %f goes back to: %v",revert_done:"Change reverted.",revert_no:"This entry can't be undone.",all_users:"All users",today:"Today",clear:"Clear",export:"Export",changes:"changes",recv_from:"Received from",recv_to:"to",no_rows:"No matching drivers",c_phone:"Phone",bad_date:"Date must be DD/MM/YYYY (e.g. 25/07/2026)",revert_sel:"Revert selected",revert_selc:"Revert %n selected changes?",revert_none:"Select changes first",details:"Details",hist_t:"Bike History",recv:"Received",lastup:"Last Updated",cur:"Current",bikeN:"Bike",assign_t:"Assign New Bike",assign_b:"Assign",nobike:"No bike",close:"Close",edit_hint2:"Change current bike status; away from With Rider releases it.",warn_a:"Bike %m is With Rider with:",confirm_a:"Reassign to this driver?"},
  ar:{login_sub:"سجّل دخولك للنظام",email:"الإيميل",password:"كلمة السر",login_btn:"دخول",need_acct:"ماعندكش حساب؟ سجّل",have_acct:"عندك حساب؟ ادخل",register_btn:"تسجيل",reg_ok:"تم التسجيل! استنى موافقة الأدمن.",new_pw_prompt:"اكتب باسورد جديد (6 حروف على الأقل):",pw_short:"الباسورد لازم 6 حروف على الأقل",pw_done:"الباسورد اتغيّر. ادخل بالباسورد الجديد.",link_expired:"اللينك يمكن يكون منتهي أو اتستخدم قبل كده. اطلب لينك جديد وافتحه على طول.",reg_dup:"الإيميل ده مسجّل قبل كده — سجّل دخول.",reg_err:"فشل التسجيل.",pending_msg:"حسابك في انتظار موافقة الأدمن.",refresh:"تحديث",logout:"خروج",imp_drv:"استيراد سائقين",imp_bk:"استيراد دراجات",backup:"باك أب",imp_done:"اتضاف / اتحدّث",imp_err:"خطأ في الاستيراد",refresh_all:"تحديث للكل",refresh_all_c:"تجبر كل المستخدمين يعملوا تحديث للبيانات دلوقتي؟",refresh_all_ok:"كل المستخدمين هيتحدّثوا خلال دقيقة",
-   t_dash:"الداش بورد",t_drivers:"السائقين",t_bikes:"الدراجات",t_audit:"سجل التتبّع",t_users:"المستخدمين",
+   t_dash:"الداش بورد",t_drivers:"السائقين",t_bikes:"الدراجات",t_bike2:"الدراجة العادية",t_audit:"سجل التتبّع",t_users:"المستخدمين",
    active:"إجمالي السائقين",working:"شغّالين + جدد",term:"إنهاء خدمة",bikesx:"الدراجات (بدون المتكهّنة)",wr:"شغّالة",
    sync_drv:"مزامنة JDE",sync_confirm:"فيه %n سائق مش في الملف ده — نعلّمهم \"إنهاء خدمة\"؟ (هيفضلوا في النظام بسجل دراجاتهم)",sync_done:"اتعلّموا إنهاء خدمة",
    cls_t:"السائقين — التصنيف",bst_t:"الدراجات — الحالة",clsh:"التصنيف",cnt:"العدد",sts:"الحالة",
@@ -179,13 +181,21 @@ async function loadAll(){document.getElementById("dash").innerHTML='<div class="
   let bikes=[],from=0;while(true){const {data}=await SB.from("bikes").select("*").range(from,from+999);if(!data||!data.length)break;bikes=bikes.concat(data);if(data.length<1000)break;from+=1000;}
   let drv=[],f2=0;while(true){const {data}=await SB.from("drivers").select("*").range(f2,f2+999);if(!data||!data.length)break;drv=drv.concat(data);if(data.length<1000)break;f2+=1000;}
   DB.bikes=bikes;DB.drivers=drv;renderDash();refreshView();}
-function tab(id,btn){["dash","drivers","bikes","audit","users"].forEach(t=>document.getElementById(t).style.display=t===id?"block":"none");
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
-  if(id==="dash")renderDash();if(id==="drivers")renderDrivers();if(id==="bikes")renderBikes();if(id==="audit")renderAudit();if(id==="users")renderUsers();}
-function refreshView(){const a=document.querySelector(".tabs button.active");if(!a)return;const id=["dash","drivers","bikes","audit","users"].find(x=>document.getElementById(x).style.display!=="none");
-  if(id==="drivers")renderDrivers();else if(id==="bikes")renderBikes();else if(id==="audit")renderAudit();else if(id==="users")renderUsers();}
+function tab(id,btn){["dash","drivers","bikes","bike2","audit","users"].forEach(t=>document.getElementById(t).style.display=t===id?"block":"none");
+  document.querySelectorAll("#tabs > button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
+  FLEET=(id==="bike2")?"bicycle":"motor";
+  if(id==="dash")renderDash();if(id==="drivers")renderDrivers();if(id==="bikes")renderBikes();if(id==="bike2")b2enter();if(id==="audit")renderAudit();if(id==="users")renderUsers();}
+function b2enter(){FLEET="bicycle";b2view="d";dF="";bF="";dP=0;bP=0;document.querySelectorAll("#b2subs button").forEach((b,i)=>b.classList.toggle("active",i===0));document.getElementById("b2dwrap").style.display="block";document.getElementById("b2bwrap").style.display="none";renderDrivers();}
+function b2sub(v,btn){FLEET="bicycle";b2view=v;document.querySelectorAll("#b2subs button").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
+  if(v==="d"){document.getElementById("b2dwrap").style.display="block";document.getElementById("b2bwrap").style.display="none";dF="";dP=0;renderDrivers();}
+  else{document.getElementById("b2dwrap").style.display="none";document.getElementById("b2bwrap").style.display="block";bF="";bP=0;renderBikes();}}
+function refreshView(){const id=["dash","drivers","bikes","bike2","audit","users"].find(x=>document.getElementById(x).style.display!=="none");
+  if(id==="drivers"){FLEET="motor";renderDrivers();}else if(id==="bikes"){FLEET="motor";renderBikes();}else if(id==="bike2"){FLEET="bicycle";b2view==="b"?renderBikes():renderDrivers();}else if(id==="audit")renderAudit();else if(id==="users")renderUsers();else if(id==="dash"){FLEET="motor";renderDash();}}
 
-function renderDash(){const D=DB.drivers,B=DB.bikes;if(!D.length&&!B.length)return;
+let FLEET="motor",b2view="d";
+function _did(k){return FLEET==="bicycle"?{box:"b2d",tb:"b2dt",cnt:"b2dc",pg:"b2dpg"}[k]:{box:"drivers",tb:"dt",cnt:"dc",pg:"dpg"}[k];}
+function _bid(k){return FLEET==="bicycle"?{box:"b2b",tb:"b2bt",cnt:"b2bc",pg:"b2bpg"}[k]:{box:"bikes",tb:"bt",cnt:"bc",pg:"bpg"}[k];}
+function renderDash(){const D=DB.drivers.filter(d=>(d.kind||"motor")==="motor"),B=DB.bikes.filter(b=>(b.kind||"motor")==="motor");if(!D.length&&!B.length)return;
   const ended=D.filter(d=>d.classification==="Ended Service"||d.classification==="Resigned").length,total=D.length-ended,working=D.filter(d=>d.classification==="Working"||d.classification==="New Rider").length;
   const cc={};D.forEach(d=>cc[d.classification]=(cc[d.classification]||0)+1);const bc={};B.forEach(b=>bc[b.status]=(bc[b.status]||0)+1);
   const disp=B.filter(b=>String(b.status).includes("Disposed")).length;
@@ -203,12 +213,12 @@ function renderDash(){const D=DB.drivers,B=DB.bikes;if(!D.length&&!B.length)retu
 
 let dP=0,dF="",dCls="",dComp="",dRecvFrom="",dRecvTo="";
 function pdmy(s){if(!s)return null;s=String(s).trim();let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(s);return isNaN(d)?null:d;}
-function renderDrivers(){document.getElementById("drivers").innerHTML=`<div class="toolbar"><input type="text" placeholder="${L("search")}" value="${dF}" oninput="dF=this.value;dP=0;drawD()">
+function renderDrivers(){const BX=_did("box"),T=_did("tb"),C=_did("cnt"),P=_did("pg");document.getElementById(BX).innerHTML=`<div class="toolbar"><input type="text" placeholder="${L("search")}" value="${dF}" oninput="dF=this.value;dP=0;drawD()">
   <select onchange="dComp=this.value;dP=0;drawD()"><option value="">${L("allc")}</option>${COMP.map(c=>`<option ${dComp===c?"selected":""}>${c}</option>`).join("")}</select>
   <select onchange="dCls=this.value;dP=0;drawD()"><option value="">${L("allcls")}</option>${CLS.map(c=>`<option ${dCls===c?"selected":""}>${c}</option>`).join("")}</select>
   <label style="font-size:12px;color:#556">${L("recv_from")} <input type="date" value="${dRecvFrom}" onchange="dRecvFrom=this.value" style="padding:7px;border:1px solid var(--line);border-radius:6px"></label>
   <label style="font-size:12px;color:#556">${L("recv_to")} <input type="date" value="${dRecvTo}" onchange="dRecvTo=this.value" style="padding:7px;border:1px solid var(--line);border-radius:6px"></label>
-  <button class="btn admin-only" style="background:#0b8043" onclick="exportDrivers()">⬇ ${L("export")}</button><span class="count" id="dc"></span></div><div id="dt"></div><div class="pager" id="dpg"></div>`;drawD();}
+  <button class="btn admin-only" style="background:#0b8043" onclick="exportDrivers()">⬇ ${L("export")}</button><span class="count" id="${C}"></span></div><div id="${T}"></div><div class="pager" id="${P}"></div>`;drawD();}
 async function exportDrivers(){const list=fD();const ids=[...new Set(list.map(d=>d.driver_id))];const recMap={};
   for(let k=0;k<ids.length;k+=300){const {data}=await SB.from("bike_history").select("driver_id,motor_id,received_date").in("driver_id",ids.slice(k,k+300));(data||[]).forEach(h=>{recMap[h.driver_id+"|"+h.motor_id]=h.received_date;});}
   const fromD=dRecvFrom?new Date(dRecvFrom):null,toD=dRecvTo?new Date(dRecvTo+"T23:59:59"):null;
@@ -217,9 +227,9 @@ async function exportDrivers(){const list=fD();const ids=[...new Set(list.map(d=
     .map(x=>({"DTC ID":x.d.driver_id,Name:x.d.name||"",Company:canonCo(x.d.company)||"",Bike:x.d.cur_motor||"",Plate:x.d.cur_plate||"",Classification:x.d.classification||"","Bike Received":x.rv,Phone:x.d.phone||""}));
   if(!rows.length){alert(L("no_rows"));return;}
   const ws=XLSX.utils.json_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Drivers");XLSX.writeFile(wb,"DTC_Drivers"+(dComp?"_"+dComp:"")+(dCls?"_"+dCls.replace(/[^\w]/g,""):"")+".xlsx");}
-function fD(){const f=dF.trim().toLowerCase();return DB.drivers.filter(d=>(!f||String(d.driver_id).includes(f)||(d.name||"").toLowerCase().includes(f)||(d.phone||"").toLowerCase().includes(f))&&(!dCls||d.classification===dCls)&&(!dComp||canonCo(d.company)===dComp));}
-function drawD(){const rows=fD(),per=50,pg=Math.ceil(rows.length/per)||1;if(dP>=pg)dP=0;const sl=rows.slice(dP*per,dP*per+per);
-  document.getElementById("dc").textContent=rows.length+" "+L("ndrv");
+function fD(){const f=dF.trim().toLowerCase();return DB.drivers.filter(d=>(d.kind||"motor")===FLEET&&(!f||String(d.driver_id).includes(f)||(d.name||"").toLowerCase().includes(f)||(d.phone||"").toLowerCase().includes(f))&&(!dCls||d.classification===dCls)&&(!dComp||canonCo(d.company)===dComp));}
+function drawD(){const T=_did("tb"),C=_did("cnt"),P=_did("pg");const rows=fD(),per=50,pg=Math.ceil(rows.length/per)||1;if(dP>=pg)dP=0;const sl=rows.slice(dP*per,dP*per+per);
+  document.getElementById(C).textContent=rows.length+" "+L("ndrv");
   let h=`<table><tr><th>${L("c_id")}</th><th>${L("c_name")}</th><th>${L("c_company")}</th><th>${L("c_bike")}</th><th>${L("c_cls")}</th><th>${L("c_phone")}</th><th></th></tr>`;
   sl.forEach(d=>{h+=`<tr><td>${d.driver_id}</td><td>${d.name||""}</td>
     <td><select onchange="upD(${d.driver_id},'company',this.value)">${COMP.map(c=>`<option ${canonCo(d.company)===c?"selected":""}>${c}</option>`).join("")}${!COMP.includes(canonCo(d.company))&&d.company?`<option selected>${canonCo(d.company)}</option>`:""}</select></td>
@@ -227,26 +237,26 @@ function drawD(){const rows=fD(),per=50,pg=Math.ceil(rows.length/per)||1;if(dP>=
     <td><select onchange="upD(${d.driver_id},'classification',this.value)">${CLS.map(c=>`<option ${d.classification===c?"selected":""}>${c}</option>`).join("")}</select></td>
     <td><input class="hinp" style="width:120px" value="${d.phone||''}" placeholder="05xxxxxxxx" onchange="upD(${d.driver_id},'phone',this.value)"></td>
     <td><button class="dbtn" onclick="openDetail(${d.driver_id})">📋 ${L("details")}</button></td></tr>`;});
-  h+=`</table>`;document.getElementById("dt").innerHTML=h;
-  document.getElementById("dpg").innerHTML=pg>1?`<button onclick="dP--;drawD()" ${dP===0?"disabled":""}>◄</button><span>${dP+1}/${pg}</span><button onclick="dP++;drawD()" ${dP>=pg-1?"disabled":""}>►</button>`:"";}
+  h+=`</table>`;document.getElementById(T).innerHTML=h;
+  document.getElementById(P).innerHTML=pg>1?`<button onclick="dP--;drawD()" ${dP===0?"disabled":""}>◄</button><span>${dP+1}/${pg}</span><button onclick="dP++;drawD()" ${dP>=pg-1?"disabled":""}>►</button>`:"";}
 async function upD(id,field,val){const d=DB.drivers.find(x=>x.driver_id===id);if(d)d[field]=val;
   const {error}=await SB.from("drivers").update({[field]:val,updated_by:USER,updated_at:new Date().toISOString()}).eq("driver_id",id);if(error)alert("❌ "+error.message);}
 
 let bP=0,bF="",bStat="",bComp="";
-function renderBikes(){document.getElementById("bikes").innerHTML=`<div class="toolbar"><input type="text" placeholder="${L("search")}" value="${bF}" oninput="bF=this.value;bP=0;drawB()">
+function renderBikes(){const BX=_bid("box"),T=_bid("tb"),C=_bid("cnt"),P=_bid("pg");document.getElementById(BX).innerHTML=`<div class="toolbar"><input type="text" placeholder="${L("search")}" value="${bF}" oninput="bF=this.value;bP=0;drawB()">
   <select onchange="bComp=this.value;bP=0;drawB()"><option value="">${L("allc")}</option>${COMP.map(c=>`<option ${bComp===c?"selected":""}>${c}</option>`).join("")}</select>
   <select onchange="bStat=this.value;bP=0;drawB()"><option value="">${L("allst")}</option>${BST.map(s=>`<option ${bStat===s?"selected":""}>${s}</option>`).join("")}</select>
-  <span class="count" id="bc"></span></div><div id="bt"></div><div class="pager" id="bpg"></div>`;drawB();}
-function fB(){const f=bF.trim().toLowerCase();return DB.bikes.filter(b=>(!f||String(b.motor_id).toLowerCase().includes(f)||String(b.plate||"").toLowerCase().includes(f))&&(!bStat||b.status===bStat)&&(!bComp||b.company===bComp));}
-function drawB(){const rows=fB(),per=50,pg=Math.ceil(rows.length/per)||1;if(bP>=pg)bP=0;const sl=rows.slice(bP*per,bP*per+per);
-  document.getElementById("bc").textContent=rows.length+" "+L("nbk");
+  <span class="count" id="${C}"></span></div><div id="${T}"></div><div class="pager" id="${P}"></div>`;drawB();}
+function fB(){const f=bF.trim().toLowerCase();return DB.bikes.filter(b=>(b.kind||"motor")===FLEET&&(!f||String(b.motor_id).toLowerCase().includes(f)||String(b.plate||"").toLowerCase().includes(f))&&(!bStat||b.status===bStat)&&(!bComp||b.company===bComp));}
+function drawB(){const T=_bid("tb"),C=_bid("cnt"),P=_bid("pg");const rows=fB(),per=50,pg=Math.ceil(rows.length/per)||1;if(bP>=pg)bP=0;const sl=rows.slice(bP*per,bP*per+per);
+  document.getElementById(C).textContent=rows.length+" "+L("nbk");
   let h=`<table><tr><th>${L("c_motor")}</th><th>${L("c_plate")}</th><th>${L("sts")}</th><th>${L("c_company")}</th><th>${L("c_driver")}</th><th>${L("lastup")}</th></tr>`;
   sl.forEach(b=>{h+=`<tr><td>${b.motor_id}</td><td>${b.plate||"—"}</td>
     <td><select onchange="upB('${b.motor_id}','status',this.value)">${BST.map(s=>`<option ${b.status===s?"selected":""}>${s}</option>`).join("")}<option ${!BST.includes(b.status)?"selected":""}>${b.status||""}</option></select></td>
     <td><select onchange="upB('${b.motor_id}','company',this.value)">${COMP.map(c=>`<option ${b.company===c?"selected":""}>${c}</option>`).join("")}<option ${!COMP.includes(b.company)?"selected":""}>${b.company||""}</option></select></td>
     <td>${b.driver_id||"—"}</td><td style="font-weight:600;color:#0b8043">${b.updated_at?new Date(b.updated_at).toLocaleDateString("en-GB"):"—"}</td></tr>`;});
-  h+=`</table>`;document.getElementById("bt").innerHTML=h;
-  document.getElementById("bpg").innerHTML=pg>1?`<button onclick="bP--;drawB()" ${bP===0?"disabled":""}>◄</button><span>${bP+1}/${pg}</span><button onclick="bP++;drawB()" ${bP>=pg-1?"disabled":""}>►</button>`:"";}
+  h+=`</table>`;document.getElementById(T).innerHTML=h;
+  document.getElementById(P).innerHTML=pg>1?`<button onclick="bP--;drawB()" ${bP===0?"disabled":""}>◄</button><span>${bP+1}/${pg}</span><button onclick="bP++;drawB()" ${bP>=pg-1?"disabled":""}>►</button>`:"";}
 async function upB(id,field,val){const b=DB.bikes.find(x=>x.motor_id===id);const now=new Date().toISOString();if(b){b[field]=val;b.updated_at=now;}
   const {error}=await SB.from("bikes").update({[field]:val,updated_by:USER,updated_at:now}).eq("motor_id",id);if(error){alert("❌ "+error.message);return;}
   if(field==="status"&&b&&b.driver_id){await SB.from("bike_history").update({status:val,last_updated:new Date().toLocaleDateString("en-GB")}).eq("motor_id",id).eq("driver_id",b.driver_id);}
@@ -318,7 +328,7 @@ async function importList(input,kind,sync){const file=input.files[0];if(!file){r
     let recs=[];const fileIds=new Set();
     if(kind==="drivers"){
       for(const r of rows){const id=String(col(r,["dtc id","driver id","id","driver_id"])).trim().replace(/\.0$/,"");if(!id||isNaN(id))continue;
-        const rec={driver_id:parseInt(id),updated_by:USER,updated_at:new Date().toISOString()};fileIds.add(parseInt(id));
+        const rec={driver_id:parseInt(id),kind:FLEET,updated_by:USER,updated_at:new Date().toISOString()};fileIds.add(parseInt(id));
         if(has(["name","الاسم"]))rec.name=col(r,["name","الاسم"])||null;
         if(has(["company","contract name","الشركة"]))rec.company=canonCo(col(r,["company","contract name","الشركة"]))||null;
         if(has(["classification","status","التصنيف"]))rec.classification=col(r,["classification","status","التصنيف"])||"Unspecified";
@@ -327,13 +337,13 @@ async function importList(input,kind,sync){const file=input.files[0];if(!file){r
         recs.push(rec);}
     }else{
       for(const r of rows){const m=String(col(r,["motor-id","motor id","motor_id","unit","unit number","الدراجة"])).trim().toUpperCase().replace(/\s+/g,"");if(!m)continue;
-        recs.push({motor_id:m,plate:String(col(r,["plate","plate no","اللوحة"])||"")||null,status:col(r,["status","الحالة"])||"Parked at DTC - Usable",
+        recs.push({motor_id:m,kind:FLEET,plate:String(col(r,["plate","plate no","اللوحة"])||"")||null,status:col(r,["status","الحالة"])||"Parked at DTC - Usable",
           company:col(r,["company","الشركة"])||null,updated_by:USER,updated_at:new Date().toISOString()});}
     }
     if(!recs.length){alert(L("imp_err"));return;}
     let ok=0;for(let i=0;i<recs.length;i+=500){const {error}=await SB.from(kind).upsert(recs.slice(i,i+500),{onConflict:kind==="drivers"?"driver_id":"motor_id"});if(error){alert("❌ "+error.message);return;}ok+=recs.slice(i,i+500).length;}
     alert("✅ "+ok+" "+L("imp_done"));
-    if(sync&&kind==="drivers"){const others=DB.drivers.filter(d=>!fileIds.has(d.driver_id)&&d.classification!=="Ended Service"&&d.classification!=="Resigned").map(d=>d.driver_id);
+    if(sync&&kind==="drivers"){const others=DB.drivers.filter(d=>(d.kind||"motor")==="motor"&&!fileIds.has(d.driver_id)&&d.classification!=="Ended Service"&&d.classification!=="Resigned").map(d=>d.driver_id);
       if(others.length&&confirm(L("sync_confirm").replace("%n",others.length))){let e2=0;
         for(let i=0;i<others.length;i+=400){const {error}=await SB.from("drivers").update({classification:"Ended Service",updated_by:USER,updated_at:new Date().toISOString()}).in("driver_id",others.slice(i,i+400));if(error){e2++;}}
         alert(e2?("⚠️ "+e2+" batch error"):("✅ "+others.length+" "+L("sync_done")));}}
@@ -430,7 +440,7 @@ async function handleRecovery(){const h=(location.hash||"").replace(/^#/,"");if(
   return false;}
 SB.auth.onAuthStateChange(async(ev)=>{if(ev==="PASSWORD_RECOVERY"&&!RECOVERING){await handleRecovery();}});
 (async()=>{applyLang();if(await handleRecovery())return;const {data:{session}}=await SB.auth.getSession();if(session)await afterLogin();})();
-const APP_VER="v20260807-12";
+const APP_VER="v20260807-13";
 function checkVer(){fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/APP_VER="([^"]+)"/);if(m&&m[1]!==APP_VER){const a=document.activeElement;if(a&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName))return;location.reload();}}).catch(()=>{});}
 setInterval(checkVer,60000);
 let SIG=null;
